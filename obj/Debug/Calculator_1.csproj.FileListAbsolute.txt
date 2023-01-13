@@ -9,3 +9,14 @@ C:\Users\chene\Desktop\school labs\Calculator_1\obj\Debug\Calculator_1.csproj.Ge
 C:\Users\chene\Desktop\school labs\Calculator_1\obj\Debug\Calculator_1.csproj.CoreCompileInputs.cache
 C:\Users\chene\Desktop\school labs\Calculator_1\obj\Debug\Calculator_1.exe
 C:\Users\chene\Desktop\school labs\Calculator_1\obj\Debug\Calculator_1.pdb
+C:\Users\chris\OneDrive\Desktop\COMP 3951\Labs\Lab 2\TechProCalculator\bin\Debug\Calculator_1.exe.config
+C:\Users\chris\OneDrive\Desktop\COMP 3951\Labs\Lab 2\TechProCalculator\bin\Debug\Calculator_1.exe
+C:\Users\chris\OneDrive\Desktop\COMP 3951\Labs\Lab 2\TechProCalculator\bin\Debug\Calculator_1.pdb
+C:\Users\chris\OneDrive\Desktop\COMP 3951\Labs\Lab 2\TechProCalculator\obj\Debug\Calculator_1.csproj.AssemblyReference.cache
+C:\Users\chris\OneDrive\Desktop\COMP 3951\Labs\Lab 2\TechProCalculator\obj\Debug\Calculator_1.csproj.SuggestedBindingRedirects.cache
+C:\Users\chris\OneDrive\Desktop\COMP 3951\Labs\Lab 2\TechProCalculator\obj\Debug\Calculator_1.Form1.resources
+C:\Users\chris\OneDrive\Desktop\COMP 3951\Labs\Lab 2\TechProCalculator\obj\Debug\Calculator_1.Properties.Resources.resources
+C:\Users\chris\OneDrive\Desktop\COMP 3951\Labs\Lab 2\TechProCalculator\obj\Debug\Calculator_1.csproj.GenerateResource.cache
+C:\Users\chris\OneDrive\Desktop\COMP 3951\Labs\Lab 2\TechProCalculator\obj\Debug\Calculator_1.csproj.CoreCompileInputs.cache
+C:\Users\chris\OneDrive\Desktop\COMP 3951\Labs\Lab 2\TechProCalculator\obj\Debug\Calculator_1.exe
+C:\Users\chris\OneDrive\Desktop\COMP 3951\Labs\Lab 2\TechProCalculator\obj\Debug\Calculator_1.pdb
