@@ -198,6 +198,7 @@
             this.buttonMR.TabIndex = 39;
             this.buttonMR.Text = "MR";
             this.buttonMR.UseVisualStyleBackColor = true;
+            this.buttonMR.Click += new System.EventHandler(this.buttonMR_Click);
             // 
             // buttonMS
             // 
@@ -207,6 +208,7 @@
             this.buttonMS.TabIndex = 38;
             this.buttonMS.Text = "MS";
             this.buttonMS.UseVisualStyleBackColor = true;
+            this.buttonMS.Click += new System.EventHandler(this.buttonMS_Click);
             // 
             // buttonMC
             // 
@@ -216,6 +218,7 @@
             this.buttonMC.TabIndex = 37;
             this.buttonMC.Text = "MC";
             this.buttonMC.UseVisualStyleBackColor = true;
+            this.buttonMC.Click += new System.EventHandler(this.buttonMC_Click);
             // 
             // buttonMPlus
             // 
@@ -225,6 +228,7 @@
             this.buttonMPlus.TabIndex = 40;
             this.buttonMPlus.Text = "M+";
             this.buttonMPlus.UseVisualStyleBackColor = true;
+            this.buttonMPlus.Click += new System.EventHandler(this.buttonMPlus_Click);
             // 
             // buttonOff
             // 
@@ -324,6 +328,7 @@
             this.buttonDelete.TabIndex = 53;
             this.buttonDelete.Text = "<-";
             this.buttonDelete.UseVisualStyleBackColor = true;
+            this.buttonDelete.Click += new System.EventHandler(this.buttonDelete_Click);
             // 
             // buttonEqual
             // 
@@ -342,6 +347,7 @@
             this.buttonC.TabIndex = 51;
             this.buttonC.Text = "C";
             this.buttonC.UseVisualStyleBackColor = true;
+            this.buttonC.Click += new System.EventHandler(this.buttonC_Click);
             // 
             // buttonCE
             // 
@@ -351,6 +357,7 @@
             this.buttonCE.TabIndex = 50;
             this.buttonCE.Text = "CE";
             this.buttonCE.UseVisualStyleBackColor = true;
+            this.buttonCE.Click += new System.EventHandler(this.buttonDelete_Click);
             // 
             // pictureBox1
             // 
