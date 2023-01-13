@@ -13,6 +13,9 @@ namespace Calculator_1
 {
     public partial class Form1 : Form
     {
+        private List<String> textboxText = new List<string>();
+        private double memory = 0;
+
         public Form1()
         {
             InitializeComponent();
@@ -76,7 +79,52 @@ namespace Calculator_1
         {
             // retrieve # f/ sender obj's Tag property
             string num = (string)((Button)sender).Tag;
+
+            if(textBox1.Text.Equals("0"))
+            {
+                textBox1.Text = num;
+            }
+            else
+            {
             textBox1.Text += num;
+            }
+            textboxText.Add(textBox1.Text);
+        }
+
+        private void buttonDelete_Click(object sender, EventArgs e)
+        {
+            string input = textBox1.Text;
+            if (input.Length > 0)
+            {
+                textBox1.Text = input.Substring(0, input.Length - 1);
+                textboxText.Add(textBox1.Text);
+            }
+        }
+
+        private void buttonC_Click(object sender, EventArgs e)
+        {
+            textBox1.Text = "0";
+            textboxText.Add(textBox1.Text);
+        }
+
+        private void buttonMC_Click(object sender, EventArgs e)
+        {
+            memory = 0;
+        }
+
+        private void buttonMR_Click(object sender, EventArgs e)
+        {
+            textBox1.Text = memory.ToString();
+        }
+
+        private void buttonMPlus_Click(object sender, EventArgs e)
+        {
+            memory += double.Parse(textBox1.Text);
+        }
+
+        private void buttonMS_Click(object sender, EventArgs e)
+        {
+            memory = double.Parse(textBox1.Text);
         }
     }
 }
