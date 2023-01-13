@@ -34,9 +34,7 @@ namespace Calculator_1
             buttonPercent.Tag = "%";
             buttonInverse.Tag = "1/";
             buttonSquare.Tag = "/";
-
             buttonDot.Tag = ".";
-
 
         }
 
