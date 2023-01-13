@@ -20,3 +20,8 @@ C:\Users\chris\OneDrive\Desktop\COMP 3951\Labs\Lab 2\TechProCalculator\obj\Debug
 C:\Users\chris\OneDrive\Desktop\COMP 3951\Labs\Lab 2\TechProCalculator\obj\Debug\Calculator_1.csproj.CoreCompileInputs.cache
 C:\Users\chris\OneDrive\Desktop\COMP 3951\Labs\Lab 2\TechProCalculator\obj\Debug\Calculator_1.exe
 C:\Users\chris\OneDrive\Desktop\COMP 3951\Labs\Lab 2\TechProCalculator\obj\Debug\Calculator_1.pdb
+C:\Users\chene\Desktop\school labs\Calculator_1\bin\Debug\Antlr4.Runtime.Standard.dll
+C:\Users\chene\Desktop\school labs\Calculator_1\bin\Debug\Dangl.Calculator.dll
+C:\Users\chene\Desktop\school labs\Calculator_1\bin\Debug\Antlr4.Runtime.Standard.xml
+C:\Users\chene\Desktop\school labs\Calculator_1\bin\Debug\Dangl.Calculator.xml
+C:\Users\chene\Desktop\school labs\Calculator_1\obj\Debug\Calculator_1.csproj.CopyComplete

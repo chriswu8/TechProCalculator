@@ -60,6 +60,8 @@
             this.buttonC = new System.Windows.Forms.Button();
             this.buttonCE = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.buttonOpenBracket = new System.Windows.Forms.Button();
+            this.buttonCloseBracket = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -148,6 +150,7 @@
             this.button12.TabIndex = 20;
             this.button12.Text = "+/-";
             this.button12.UseVisualStyleBackColor = true;
+            this.button12.Click += new System.EventHandler(this.buttonArithmetic_Click);
             // 
             // button2
             // 
@@ -332,6 +335,7 @@
             this.buttonEqual.TabIndex = 52;
             this.buttonEqual.Text = "=";
             this.buttonEqual.UseVisualStyleBackColor = true;
+            this.buttonEqual.Click += new System.EventHandler(this.evaluateFunction);
             // 
             // buttonC
             // 
@@ -362,11 +366,33 @@
             this.pictureBox1.TabStop = false;
             this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
+            // buttonOpenBracket
+            // 
+            this.buttonOpenBracket.Location = new System.Drawing.Point(29, 133);
+            this.buttonOpenBracket.Name = "buttonOpenBracket";
+            this.buttonOpenBracket.Size = new System.Drawing.Size(61, 35);
+            this.buttonOpenBracket.TabIndex = 55;
+            this.buttonOpenBracket.Text = "(";
+            this.buttonOpenBracket.UseVisualStyleBackColor = true;
+            this.buttonOpenBracket.Click += new System.EventHandler(this.buttonArithmetic_Click);
+            // 
+            // buttonCloseBracket
+            // 
+            this.buttonCloseBracket.Location = new System.Drawing.Point(96, 133);
+            this.buttonCloseBracket.Name = "buttonCloseBracket";
+            this.buttonCloseBracket.Size = new System.Drawing.Size(61, 35);
+            this.buttonCloseBracket.TabIndex = 56;
+            this.buttonCloseBracket.Text = ")";
+            this.buttonCloseBracket.UseVisualStyleBackColor = true;
+            this.buttonCloseBracket.Click += new System.EventHandler(this.buttonArithmetic_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(490, 579);
+            this.Controls.Add(this.buttonCloseBracket);
+            this.Controls.Add(this.buttonOpenBracket);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.buttonDelete);
             this.Controls.Add(this.buttonEqual);
@@ -441,6 +467,8 @@
         private System.Windows.Forms.Button buttonC;
         private System.Windows.Forms.Button buttonCE;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Button buttonOpenBracket;
+        private System.Windows.Forms.Button buttonCloseBracket;
     }
 }
 
