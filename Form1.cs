@@ -18,20 +18,37 @@ namespace Calculator_1
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void pictureBox1_Click(object sender, EventArgs e)
         {
-            string s = (sender as Button).Text;
-            Console.WriteLine(s);
-            textBox1.Text = "je;;p";
+            try
+            {
+                Graphics gfx = Graphics.FromImage(pictureBox1.Image);
+                Point point = new Point(0, 0);
+                Image mathImage = Image.FromFile(Application.StartupPath + "/Resources/bcit.png");
+                gfx.DrawImage(mathImage, point );
+                pictureBox1.Invalidate();
+            }
+            catch (Exception ex) 
+            { 
+                MessageBox.Show(ex.Message, "Error opening image", MessageBoxButtons.OK);
+            }
+
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void button29_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
+            try
+            {
+                Graphics gfx = Graphics.FromImage(pictureBox1.Image);
+                Point point = new Point(0, 0);
+                Image mathImage = Image.FromFile(Application.StartupPath + "/Resources/bcit.png");
+                gfx.DrawImage(mathImage, point);
+                pictureBox1.Invalidate();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error opening image", MessageBoxButtons.OK);
+            }
 
         }
     }
