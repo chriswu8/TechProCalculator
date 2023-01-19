@@ -1,0 +1,2483 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Dangl.Calculator</name>
+    </assembly>
+    <members>
+        <member name="T:Dangl.Calculator.CalculationResult">
+            <summary>
+            Container class that holds the result of a calculation
+            </summary>
+        </member>
+        <member name="P:Dangl.Calculator.CalculationResult.IsValid">
+            <summary>
+                Indicates if the formula was valid and a result was calculated. If false, the result will be either NaN or Infinity
+            </summary>
+        </member>
+        <member name="P:Dangl.Calculator.CalculationResult.ErrorPosition">
+            <summary>
+                The position on which the first error was encountered. This is a zero based index. Will report -1 for
+                division by zero, but result will be reported as invalid
+            </summary>
+        </member>
+        <member name="P:Dangl.Calculator.CalculationResult.ErrorMessage">
+            <summary>
+            Relays the underlying formula parsers error message
+            </summary>
+        </member>
+        <member name="P:Dangl.Calculator.CalculationResult.Result">
+            <summary>
+            The calculated result
+            </summary>
+        </member>
+        <member name="T:Dangl.Calculator.Calculator">
+            <summary>
+                This class provides functionality to calculate a mathematical expression from a string.
+            </summary>
+        </member>
+        <member name="M:Dangl.Calculator.Calculator.Calculate(System.String)">
+            <summary>
+                This takes a string as input and returns the calculated result as decimal.
+            </summary>
+            <param name="formula">The mathematical expression as string to be calculated.</param>
+        </member>
+        <member name="M:Dangl.Calculator.Calculator.Calculate(System.String,System.Func{System.String,System.Nullable{System.Double}})">
+            <summary>
+                This takes a string as input and returns the calculated result as decimal.
+            </summary>
+            <param name="formula">The mathematical expression as string to be calculated.</param>
+            <param name="substitutionResolver">
+                This callback may be used to resolve substitutions. If a null value is returned
+                by this callback, the formula is considered invalid.
+            </param>
+        </member>
+        <member name="M:Dangl.Calculator.Calculator.CalculateResult(System.String,System.Boolean,System.Func{System.String,System.Nullable{System.Double}})">
+            <summary>
+                This will attempt to recalculate if an error was encountered. Will try to skip whitespaces
+                and comments so to prevent number literals and function qualifiers not being identified.
+            </summary>
+            <param name="formula"></param>
+            <param name="secondRun"></param>
+            <param name="substitutionResolver">
+                This callback may be used to resolve substitutions. If a null value is returned
+                by this callback, the formula is considered invalid.
+            </param>
+            <returns></returns>
+        </member>
+        <member name="T:Dangl.Calculator.CalculatorErrorListener">
+            <summary>
+                This class overrides some functionalities of the ANTLR4 BaseErrorListener.
+                It will create error objects upon encountering errors in the expression.
+            </summary>
+        </member>
+        <member name="P:Dangl.Calculator.CalculatorErrorListener.IsValid">
+            <summary>
+            Returns false if any errors have been reported
+            </summary>
+        </member>
+        <member name="P:Dangl.Calculator.CalculatorErrorListener.ErrorLocation">
+            <summary>
+            Returns the location an encountered syntax error, -1 otherwise
+            </summary>
+        </member>
+        <member name="P:Dangl.Calculator.CalculatorErrorListener.ErrorMessage">
+            <summary>
+            Returns the message of an encountered syntax error
+            </summary>
+        </member>
+        <member name="M:Dangl.Calculator.CalculatorErrorListener.SyntaxError(System.IO.TextWriter,Antlr4.Runtime.IRecognizer,Antlr4.Runtime.IToken,System.Int32,System.Int32,System.String,Antlr4.Runtime.RecognitionException)">
+            <summary>
+            Sets <see cref="P:Dangl.Calculator.CalculatorErrorListener.IsValid"/> to false and <see cref="P:Dangl.Calculator.CalculatorErrorListener.ErrorLocation"/> and <see cref="P:Dangl.Calculator.CalculatorErrorListener.ErrorMessage"/> to the values provided by the parser
+            </summary>
+        </member>
+        <member name="M:Dangl.Calculator.CalculatorErrorListener.ReportSubstitutionNotFound(System.Int32,System.String)">
+            <summary>
+            Sets <see cref="P:Dangl.Calculator.CalculatorErrorListener.IsValid"/> to false and <see cref="P:Dangl.Calculator.CalculatorErrorListener.ErrorLocation"/> to the value provided by the caller. The <see cref="P:Dangl.Calculator.CalculatorErrorListener.ErrorMessage"/> will be set
+            to indicate which substitution value was not found.
+            </summary>
+            <param name="errorLocation"></param>
+            <param name="substitution"></param>
+        </member>
+        <member name="T:Dangl.Calculator.CalculatorVisitor">
+            <summary>
+                This is the visitor to actually perform the mathematical calculation of a given expression.
+            </summary>
+        </member>
+        <member name="T:CalculatorBaseListener">
+            <summary>
+            This class provides an empty implementation of <see cref="T:ICalculatorListener"/>,
+            which can be extended to create a listener which only needs to handle a subset
+            of the available methods.
+            </summary>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterCalculator(CalculatorParser.CalculatorContext)">
+            <summary>
+            Enter a parse tree produced by <see cref="M:CalculatorParser.calculator"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitCalculator(CalculatorParser.CalculatorContext)">
+            <summary>
+            Exit a parse tree produced by <see cref="M:CalculatorParser.calculator"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterTan(CalculatorParser.TanContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Tan</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitTan(CalculatorParser.TanContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Tan</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterCosh(CalculatorParser.CoshContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Cosh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitCosh(CalculatorParser.CoshContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Cosh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterSqRoot(CalculatorParser.SqRootContext)">
+            <summary>
+            Enter a parse tree produced by the <c>SqRoot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitSqRoot(CalculatorParser.SqRootContext)">
+            <summary>
+            Exit a parse tree produced by the <c>SqRoot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterNegExponent(CalculatorParser.NegExponentContext)">
+            <summary>
+            Enter a parse tree produced by the <c>NegExponent</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitNegExponent(CalculatorParser.NegExponentContext)">
+            <summary>
+            Exit a parse tree produced by the <c>NegExponent</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterExponent(CalculatorParser.ExponentContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Exponent</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitExponent(CalculatorParser.ExponentContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Exponent</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterArctan2(CalculatorParser.Arctan2Context)">
+            <summary>
+            Enter a parse tree produced by the <c>Arctan2</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitArctan2(CalculatorParser.Arctan2Context)">
+            <summary>
+            Exit a parse tree produced by the <c>Arctan2</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterMax(CalculatorParser.MaxContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Max</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitMax(CalculatorParser.MaxContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Max</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterMulDiv(CalculatorParser.MulDivContext)">
+            <summary>
+            Enter a parse tree produced by the <c>MulDiv</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitMulDiv(CalculatorParser.MulDivContext)">
+            <summary>
+            Exit a parse tree produced by the <c>MulDiv</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterArcsin(CalculatorParser.ArcsinContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Arcsin</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitArcsin(CalculatorParser.ArcsinContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Arcsin</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterUnaryPlus(CalculatorParser.UnaryPlusContext)">
+            <summary>
+            Enter a parse tree produced by the <c>UnaryPlus</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitUnaryPlus(CalculatorParser.UnaryPlusContext)">
+            <summary>
+            Exit a parse tree produced by the <c>UnaryPlus</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterArccot(CalculatorParser.ArccotContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Arccot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitArccot(CalculatorParser.ArccotContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Arccot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterArccos(CalculatorParser.ArccosContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Arccos</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitArccos(CalculatorParser.ArccosContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Arccos</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterEuler(CalculatorParser.EulerContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Euler</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitEuler(CalculatorParser.EulerContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Euler</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterArctan(CalculatorParser.ArctanContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Arctan</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitArctan(CalculatorParser.ArctanContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Arctan</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterParenthesis(CalculatorParser.ParenthesisContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Parenthesis</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitParenthesis(CalculatorParser.ParenthesisContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Parenthesis</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterAbs(CalculatorParser.AbsContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Abs</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitAbs(CalculatorParser.AbsContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Abs</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterNumber(CalculatorParser.NumberContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Number</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitNumber(CalculatorParser.NumberContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Number</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterSubstitution(CalculatorParser.SubstitutionContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Substitution</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitSubstitution(CalculatorParser.SubstitutionContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Substitution</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterSinh(CalculatorParser.SinhContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Sinh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitSinh(CalculatorParser.SinhContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Sinh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterRound(CalculatorParser.RoundContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Round</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitRound(CalculatorParser.RoundContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Round</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterTrunc(CalculatorParser.TruncContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Trunc</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitTrunc(CalculatorParser.TruncContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Trunc</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterPi(CalculatorParser.PiContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Pi</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitPi(CalculatorParser.PiContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Pi</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterTanh(CalculatorParser.TanhContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Tanh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitTanh(CalculatorParser.TanhContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Tanh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterFloor(CalculatorParser.FloorContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Floor</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitFloor(CalculatorParser.FloorContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Floor</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterLn(CalculatorParser.LnContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Ln</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitLn(CalculatorParser.LnContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Ln</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterMod(CalculatorParser.ModContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Mod</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitMod(CalculatorParser.ModContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Mod</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterLog(CalculatorParser.LogContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Log</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitLog(CalculatorParser.LogContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Log</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterAddSub(CalculatorParser.AddSubContext)">
+            <summary>
+            Enter a parse tree produced by the <c>AddSub</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitAddSub(CalculatorParser.AddSubContext)">
+            <summary>
+            Exit a parse tree produced by the <c>AddSub</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterCos(CalculatorParser.CosContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Cos</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitCos(CalculatorParser.CosContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Cos</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterDeg(CalculatorParser.DegContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Deg</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitDeg(CalculatorParser.DegContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Deg</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterSqrt(CalculatorParser.SqrtContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Sqrt</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitSqrt(CalculatorParser.SqrtContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Sqrt</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterCot(CalculatorParser.CotContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Cot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitCot(CalculatorParser.CotContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Cot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterWhole(CalculatorParser.WholeContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Whole</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitWhole(CalculatorParser.WholeContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Whole</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterUnary(CalculatorParser.UnaryContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Unary</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitUnary(CalculatorParser.UnaryContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Unary</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterMin(CalculatorParser.MinContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Min</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitMin(CalculatorParser.MinContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Min</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterRad(CalculatorParser.RadContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Rad</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitRad(CalculatorParser.RadContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Rad</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterMult(CalculatorParser.MultContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Mult</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitMult(CalculatorParser.MultContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Mult</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterSqr(CalculatorParser.SqrContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Sqr</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitSqr(CalculatorParser.SqrContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Sqr</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterSin(CalculatorParser.SinContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Sin</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitSin(CalculatorParser.SinContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Sin</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterEex(CalculatorParser.EexContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Eex</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitEex(CalculatorParser.EexContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Eex</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterPow(CalculatorParser.PowContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Pow</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitPow(CalculatorParser.PowContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Pow</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterCeil(CalculatorParser.CeilContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Ceil</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitCeil(CalculatorParser.CeilContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Ceil</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterExp(CalculatorParser.ExpContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Exp</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitExp(CalculatorParser.ExpContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Exp</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterRoundk(CalculatorParser.RoundkContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Roundk</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitRoundk(CalculatorParser.RoundkContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Roundk</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterTrailingComment(CalculatorParser.TrailingCommentContext)">
+            <summary>
+            Enter a parse tree produced by <see cref="M:CalculatorParser.trailingComment"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitTrailingComment(CalculatorParser.TrailingCommentContext)">
+            <summary>
+            Exit a parse tree produced by <see cref="M:CalculatorParser.trailingComment"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterCompileUnit(CalculatorParser.CompileUnitContext)">
+            <summary>
+            Enter a parse tree produced by <see cref="M:CalculatorParser.compileUnit"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitCompileUnit(CalculatorParser.CompileUnitContext)">
+            <summary>
+            Exit a parse tree produced by <see cref="M:CalculatorParser.compileUnit"/>.
+            <para>The default implementation does nothing.</para>
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:CalculatorBaseListener.EnterEveryRule(Antlr4.Runtime.ParserRuleContext)">
+            <inheritdoc/>
+            <remarks>The default implementation does nothing.</remarks>
+        </member>
+        <member name="M:CalculatorBaseListener.ExitEveryRule(Antlr4.Runtime.ParserRuleContext)">
+            <inheritdoc/>
+            <remarks>The default implementation does nothing.</remarks>
+        </member>
+        <member name="M:CalculatorBaseListener.VisitTerminal(Antlr4.Runtime.Tree.ITerminalNode)">
+            <inheritdoc/>
+            <remarks>The default implementation does nothing.</remarks>
+        </member>
+        <member name="M:CalculatorBaseListener.VisitErrorNode(Antlr4.Runtime.Tree.IErrorNode)">
+            <inheritdoc/>
+            <remarks>The default implementation does nothing.</remarks>
+        </member>
+        <member name="T:CalculatorBaseVisitor`1">
+            <summary>
+            This class provides an empty implementation of <see cref="T:ICalculatorVisitor`1"/>,
+            which can be extended to create a visitor which only needs to handle a subset
+            of the available methods.
+            </summary>
+            <typeparam name="Result">The return type of the visit operation.</typeparam>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitCalculator(CalculatorParser.CalculatorContext)">
+            <summary>
+            Visit a parse tree produced by <see cref="M:CalculatorParser.calculator"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitTan(CalculatorParser.TanContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Tan</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitCosh(CalculatorParser.CoshContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Cosh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitSqRoot(CalculatorParser.SqRootContext)">
+            <summary>
+            Visit a parse tree produced by the <c>SqRoot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitNegExponent(CalculatorParser.NegExponentContext)">
+            <summary>
+            Visit a parse tree produced by the <c>NegExponent</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitExponent(CalculatorParser.ExponentContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Exponent</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitArctan2(CalculatorParser.Arctan2Context)">
+            <summary>
+            Visit a parse tree produced by the <c>Arctan2</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitMax(CalculatorParser.MaxContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Max</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitMulDiv(CalculatorParser.MulDivContext)">
+            <summary>
+            Visit a parse tree produced by the <c>MulDiv</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitArcsin(CalculatorParser.ArcsinContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Arcsin</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitUnaryPlus(CalculatorParser.UnaryPlusContext)">
+            <summary>
+            Visit a parse tree produced by the <c>UnaryPlus</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitArccot(CalculatorParser.ArccotContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Arccot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitArccos(CalculatorParser.ArccosContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Arccos</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitEuler(CalculatorParser.EulerContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Euler</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitArctan(CalculatorParser.ArctanContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Arctan</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitParenthesis(CalculatorParser.ParenthesisContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Parenthesis</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitAbs(CalculatorParser.AbsContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Abs</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitNumber(CalculatorParser.NumberContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Number</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitSubstitution(CalculatorParser.SubstitutionContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Substitution</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitSinh(CalculatorParser.SinhContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Sinh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitRound(CalculatorParser.RoundContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Round</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitTrunc(CalculatorParser.TruncContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Trunc</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitPi(CalculatorParser.PiContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Pi</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitTanh(CalculatorParser.TanhContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Tanh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitFloor(CalculatorParser.FloorContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Floor</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitLn(CalculatorParser.LnContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Ln</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitMod(CalculatorParser.ModContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Mod</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitLog(CalculatorParser.LogContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Log</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitAddSub(CalculatorParser.AddSubContext)">
+            <summary>
+            Visit a parse tree produced by the <c>AddSub</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitCos(CalculatorParser.CosContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Cos</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitDeg(CalculatorParser.DegContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Deg</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitSqrt(CalculatorParser.SqrtContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Sqrt</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitCot(CalculatorParser.CotContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Cot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitWhole(CalculatorParser.WholeContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Whole</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitUnary(CalculatorParser.UnaryContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Unary</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitMin(CalculatorParser.MinContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Min</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitRad(CalculatorParser.RadContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Rad</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitMult(CalculatorParser.MultContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Mult</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitSqr(CalculatorParser.SqrContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Sqr</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitSin(CalculatorParser.SinContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Sin</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitEex(CalculatorParser.EexContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Eex</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitPow(CalculatorParser.PowContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Pow</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitCeil(CalculatorParser.CeilContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Ceil</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitExp(CalculatorParser.ExpContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Exp</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitRoundk(CalculatorParser.RoundkContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Roundk</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitTrailingComment(CalculatorParser.TrailingCommentContext)">
+            <summary>
+            Visit a parse tree produced by <see cref="M:CalculatorParser.trailingComment"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:CalculatorBaseVisitor`1.VisitCompileUnit(CalculatorParser.CompileUnitContext)">
+            <summary>
+            Visit a parse tree produced by <see cref="M:CalculatorParser.compileUnit"/>.
+            <para>
+            The default implementation returns the result of calling <see cref="M:Antlr4.Runtime.Tree.AbstractParseTreeVisitor`1.VisitChildren(Antlr4.Runtime.Tree.IRuleNode)"/>
+            on <paramref name="context"/>.
+            </para>
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="T:ICalculatorListener">
+            <summary>
+            This interface defines a complete listener for a parse tree produced by
+            <see cref="T:CalculatorParser"/>.
+            </summary>
+        </member>
+        <member name="M:ICalculatorListener.EnterCalculator(CalculatorParser.CalculatorContext)">
+            <summary>
+            Enter a parse tree produced by <see cref="M:CalculatorParser.calculator"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitCalculator(CalculatorParser.CalculatorContext)">
+            <summary>
+            Exit a parse tree produced by <see cref="M:CalculatorParser.calculator"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterTan(CalculatorParser.TanContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Tan</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitTan(CalculatorParser.TanContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Tan</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterCosh(CalculatorParser.CoshContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Cosh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitCosh(CalculatorParser.CoshContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Cosh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterSqRoot(CalculatorParser.SqRootContext)">
+            <summary>
+            Enter a parse tree produced by the <c>SqRoot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitSqRoot(CalculatorParser.SqRootContext)">
+            <summary>
+            Exit a parse tree produced by the <c>SqRoot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterNegExponent(CalculatorParser.NegExponentContext)">
+            <summary>
+            Enter a parse tree produced by the <c>NegExponent</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitNegExponent(CalculatorParser.NegExponentContext)">
+            <summary>
+            Exit a parse tree produced by the <c>NegExponent</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterExponent(CalculatorParser.ExponentContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Exponent</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitExponent(CalculatorParser.ExponentContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Exponent</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterArctan2(CalculatorParser.Arctan2Context)">
+            <summary>
+            Enter a parse tree produced by the <c>Arctan2</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitArctan2(CalculatorParser.Arctan2Context)">
+            <summary>
+            Exit a parse tree produced by the <c>Arctan2</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterMax(CalculatorParser.MaxContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Max</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitMax(CalculatorParser.MaxContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Max</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterMulDiv(CalculatorParser.MulDivContext)">
+            <summary>
+            Enter a parse tree produced by the <c>MulDiv</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitMulDiv(CalculatorParser.MulDivContext)">
+            <summary>
+            Exit a parse tree produced by the <c>MulDiv</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterArcsin(CalculatorParser.ArcsinContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Arcsin</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitArcsin(CalculatorParser.ArcsinContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Arcsin</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterUnaryPlus(CalculatorParser.UnaryPlusContext)">
+            <summary>
+            Enter a parse tree produced by the <c>UnaryPlus</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitUnaryPlus(CalculatorParser.UnaryPlusContext)">
+            <summary>
+            Exit a parse tree produced by the <c>UnaryPlus</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterArccot(CalculatorParser.ArccotContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Arccot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitArccot(CalculatorParser.ArccotContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Arccot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterArccos(CalculatorParser.ArccosContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Arccos</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitArccos(CalculatorParser.ArccosContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Arccos</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterEuler(CalculatorParser.EulerContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Euler</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitEuler(CalculatorParser.EulerContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Euler</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterArctan(CalculatorParser.ArctanContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Arctan</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitArctan(CalculatorParser.ArctanContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Arctan</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterParenthesis(CalculatorParser.ParenthesisContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Parenthesis</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitParenthesis(CalculatorParser.ParenthesisContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Parenthesis</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterAbs(CalculatorParser.AbsContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Abs</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitAbs(CalculatorParser.AbsContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Abs</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterNumber(CalculatorParser.NumberContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Number</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitNumber(CalculatorParser.NumberContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Number</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterSubstitution(CalculatorParser.SubstitutionContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Substitution</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitSubstitution(CalculatorParser.SubstitutionContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Substitution</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterSinh(CalculatorParser.SinhContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Sinh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitSinh(CalculatorParser.SinhContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Sinh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterRound(CalculatorParser.RoundContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Round</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitRound(CalculatorParser.RoundContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Round</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterTrunc(CalculatorParser.TruncContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Trunc</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitTrunc(CalculatorParser.TruncContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Trunc</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterPi(CalculatorParser.PiContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Pi</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitPi(CalculatorParser.PiContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Pi</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterTanh(CalculatorParser.TanhContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Tanh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitTanh(CalculatorParser.TanhContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Tanh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterFloor(CalculatorParser.FloorContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Floor</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitFloor(CalculatorParser.FloorContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Floor</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterLn(CalculatorParser.LnContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Ln</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitLn(CalculatorParser.LnContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Ln</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterMod(CalculatorParser.ModContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Mod</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitMod(CalculatorParser.ModContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Mod</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterLog(CalculatorParser.LogContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Log</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitLog(CalculatorParser.LogContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Log</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterAddSub(CalculatorParser.AddSubContext)">
+            <summary>
+            Enter a parse tree produced by the <c>AddSub</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitAddSub(CalculatorParser.AddSubContext)">
+            <summary>
+            Exit a parse tree produced by the <c>AddSub</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterCos(CalculatorParser.CosContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Cos</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitCos(CalculatorParser.CosContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Cos</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterDeg(CalculatorParser.DegContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Deg</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitDeg(CalculatorParser.DegContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Deg</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterSqrt(CalculatorParser.SqrtContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Sqrt</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitSqrt(CalculatorParser.SqrtContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Sqrt</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterCot(CalculatorParser.CotContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Cot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitCot(CalculatorParser.CotContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Cot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterWhole(CalculatorParser.WholeContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Whole</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitWhole(CalculatorParser.WholeContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Whole</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterUnary(CalculatorParser.UnaryContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Unary</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitUnary(CalculatorParser.UnaryContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Unary</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterMin(CalculatorParser.MinContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Min</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitMin(CalculatorParser.MinContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Min</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterRad(CalculatorParser.RadContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Rad</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitRad(CalculatorParser.RadContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Rad</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterMult(CalculatorParser.MultContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Mult</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitMult(CalculatorParser.MultContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Mult</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterSqr(CalculatorParser.SqrContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Sqr</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitSqr(CalculatorParser.SqrContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Sqr</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterSin(CalculatorParser.SinContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Sin</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitSin(CalculatorParser.SinContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Sin</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterEex(CalculatorParser.EexContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Eex</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitEex(CalculatorParser.EexContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Eex</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterPow(CalculatorParser.PowContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Pow</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitPow(CalculatorParser.PowContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Pow</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterCeil(CalculatorParser.CeilContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Ceil</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitCeil(CalculatorParser.CeilContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Ceil</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterExp(CalculatorParser.ExpContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Exp</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitExp(CalculatorParser.ExpContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Exp</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterRoundk(CalculatorParser.RoundkContext)">
+            <summary>
+            Enter a parse tree produced by the <c>Roundk</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitRoundk(CalculatorParser.RoundkContext)">
+            <summary>
+            Exit a parse tree produced by the <c>Roundk</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterTrailingComment(CalculatorParser.TrailingCommentContext)">
+            <summary>
+            Enter a parse tree produced by <see cref="M:CalculatorParser.trailingComment"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitTrailingComment(CalculatorParser.TrailingCommentContext)">
+            <summary>
+            Exit a parse tree produced by <see cref="M:CalculatorParser.trailingComment"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.EnterCompileUnit(CalculatorParser.CompileUnitContext)">
+            <summary>
+            Enter a parse tree produced by <see cref="M:CalculatorParser.compileUnit"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="M:ICalculatorListener.ExitCompileUnit(CalculatorParser.CompileUnitContext)">
+            <summary>
+            Exit a parse tree produced by <see cref="M:CalculatorParser.compileUnit"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+        </member>
+        <member name="T:ICalculatorVisitor`1">
+            <summary>
+            This interface defines a complete generic visitor for a parse tree produced
+            by <see cref="T:CalculatorParser"/>.
+            </summary>
+            <typeparam name="Result">The return type of the visit operation.</typeparam>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitCalculator(CalculatorParser.CalculatorContext)">
+            <summary>
+            Visit a parse tree produced by <see cref="M:CalculatorParser.calculator"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitTan(CalculatorParser.TanContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Tan</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitCosh(CalculatorParser.CoshContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Cosh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitSqRoot(CalculatorParser.SqRootContext)">
+            <summary>
+            Visit a parse tree produced by the <c>SqRoot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitNegExponent(CalculatorParser.NegExponentContext)">
+            <summary>
+            Visit a parse tree produced by the <c>NegExponent</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitExponent(CalculatorParser.ExponentContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Exponent</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitArctan2(CalculatorParser.Arctan2Context)">
+            <summary>
+            Visit a parse tree produced by the <c>Arctan2</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitMax(CalculatorParser.MaxContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Max</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitMulDiv(CalculatorParser.MulDivContext)">
+            <summary>
+            Visit a parse tree produced by the <c>MulDiv</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitArcsin(CalculatorParser.ArcsinContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Arcsin</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitUnaryPlus(CalculatorParser.UnaryPlusContext)">
+            <summary>
+            Visit a parse tree produced by the <c>UnaryPlus</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitArccot(CalculatorParser.ArccotContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Arccot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitArccos(CalculatorParser.ArccosContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Arccos</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitEuler(CalculatorParser.EulerContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Euler</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitArctan(CalculatorParser.ArctanContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Arctan</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitParenthesis(CalculatorParser.ParenthesisContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Parenthesis</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitAbs(CalculatorParser.AbsContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Abs</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitNumber(CalculatorParser.NumberContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Number</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitSubstitution(CalculatorParser.SubstitutionContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Substitution</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitSinh(CalculatorParser.SinhContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Sinh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitRound(CalculatorParser.RoundContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Round</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitTrunc(CalculatorParser.TruncContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Trunc</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitPi(CalculatorParser.PiContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Pi</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitTanh(CalculatorParser.TanhContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Tanh</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitFloor(CalculatorParser.FloorContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Floor</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitLn(CalculatorParser.LnContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Ln</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitMod(CalculatorParser.ModContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Mod</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitLog(CalculatorParser.LogContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Log</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitAddSub(CalculatorParser.AddSubContext)">
+            <summary>
+            Visit a parse tree produced by the <c>AddSub</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitCos(CalculatorParser.CosContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Cos</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitDeg(CalculatorParser.DegContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Deg</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitSqrt(CalculatorParser.SqrtContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Sqrt</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitCot(CalculatorParser.CotContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Cot</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitWhole(CalculatorParser.WholeContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Whole</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitUnary(CalculatorParser.UnaryContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Unary</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitMin(CalculatorParser.MinContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Min</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitRad(CalculatorParser.RadContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Rad</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitMult(CalculatorParser.MultContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Mult</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitSqr(CalculatorParser.SqrContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Sqr</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitSin(CalculatorParser.SinContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Sin</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitEex(CalculatorParser.EexContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Eex</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitPow(CalculatorParser.PowContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Pow</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitCeil(CalculatorParser.CeilContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Ceil</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitExp(CalculatorParser.ExpContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Exp</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitRoundk(CalculatorParser.RoundkContext)">
+            <summary>
+            Visit a parse tree produced by the <c>Roundk</c>
+            labeled alternative in <see cref="M:CalculatorParser.expression"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitTrailingComment(CalculatorParser.TrailingCommentContext)">
+            <summary>
+            Visit a parse tree produced by <see cref="M:CalculatorParser.trailingComment"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+        <member name="M:ICalculatorVisitor`1.VisitCompileUnit(CalculatorParser.CompileUnitContext)">
+            <summary>
+            Visit a parse tree produced by <see cref="M:CalculatorParser.compileUnit"/>.
+            </summary>
+            <param name="context">The parse tree.</param>
+            <return>The visitor result.</return>
+        </member>
+    </members>
+</doc>
